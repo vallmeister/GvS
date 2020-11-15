@@ -2,6 +2,8 @@ package SocketWorkshop.restaurant;
 
 import SocketWorkshop.Italiana;
 
+import java.io.*;
+
 /**
  * Aufgabe 1
  * Simple Java-Stream I/O
@@ -20,5 +22,15 @@ public class OrderPizza {
       System.exit(1);
     }
     // add your code
+    try (FileOutputStream fileOutputStream
+             = new FileOutputStream("./resources/bestellungen.txt", false)) {
+      String pizzaString = args[0] + "\n";
+      byte[] pizzaBytes = pizzaString.getBytes();
+      fileOutputStream.write(pizzaBytes);
+    } catch (FileNotFoundException fileNotFoundException) {
+      fileNotFoundException.printStackTrace();
+    } catch (IOException exception) {
+      exception.printStackTrace();
+    }
   }
 }
