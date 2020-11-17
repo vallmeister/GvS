@@ -28,6 +28,8 @@ dependencies {
     testImplementation 'junit:junit:4.13'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
+
+    compile group: 'org.zeromq', name: 'jeromq', version: '0.5.2'
 }
 
 application {
