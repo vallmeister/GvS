@@ -17,7 +17,7 @@ public class EchoClient {
   public static void main(String[] args) {
     // Like the given tutorial
     try {
-      Socket socket= new Socket(HOST, PORT);
+      Socket socket = new Socket(HOST, PORT);
       PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
       BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
       BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
