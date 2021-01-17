@@ -91,8 +91,8 @@ class VectorTest {
 
     x = new Vector(Arrays.asList(8L,4L,0L),2);
 
-    assertEquals(0, java.util.Optional.of(Vector.compare(a, b).get()));
-    assertEquals(0, java.util.Optional.of(Vector.compare(n1, n2).get()));
+    assertEquals(0, java.util.Optional.of(Vector.compare(a, b)).get());
+    assertEquals(0, java.util.Optional.of(Vector.compare(n1, n2)).get());
 
     assertTrue( Vector.compare(c,a).get()>0);
     assertTrue( Vector.compare(a,c).get()<0);

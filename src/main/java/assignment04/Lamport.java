@@ -25,18 +25,17 @@ public class Lamport implements Comparable<Lamport>{
   }
 
   public long merge(Lamport b) {
-    // TODO
-    return 0;
+    counter = Math.max(counter, b.getTime());
+    increment();
+    return counter;
   }
 
   public static Lamport merge(Lamport a, Lamport b) {
-    // TODO
-    return null;
+    return new Lamport(a.merge(b));
   }
 
   public static int compare(Lamport a, Lamport b) {
-    // TODO
-    return 0;
+    return a.compareTo(b);
   }
 
   public boolean equals(Lamport b) {

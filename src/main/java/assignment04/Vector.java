@@ -3,57 +3,68 @@ package assignment04;
 import java.util.*;
 
 public class Vector {
-  // TODO
+  private long[] vector;
+  private int pid;
+  private int dimension;
 
   public Vector(Collection<Long> C, int id) {
-    // TODO
+    vector = C.stream().mapToLong(l -> l).toArray();
+    pid = id;
+    dimension = vector.length;
   }
 
   public Vector(int size, int id){
-    // TODO
+    vector = new long[size];
+    pid = id;
+    dimension = size;
   }
 
   /**
    * Returns all times in the vector
    */
   public long[] getTime() {
-    // TODO
-    return new long[1];
+    return vector.clone();
   }
 
   /**
    * Also returns incremented time for own processid
    */
   public long increment() {
-    // TODO
-    return 0;
+    long tmp = ++vector[pid];
+    return tmp;
   }
 
   /**
    * Returns time of given id
    */
   public long getTime(int id) {
-    // TODO
-    return 0;
+    return vector[id];
   }
 
   public long merge(Vector b) throws IllegalArgumentException{
-    // TODO
-    return 0;
+    if (dimension != b.size()) throw new IllegalArgumentException("Vectors are of diefferent size");
+
+    for (int i = 0; i < dimension; i++) {
+      vector[i] = Math.max(vector[i], b.getTime(i));
+    }
+    increment();
+    return getTime(pid);
   }
 
   public long size() {
-    // TODO
-    return 0;
+    return dimension;
   }
 
   /**
-   * Greater-or-Equals Comparisson
+   * Greater-or-Equals Comparison
    * IllegalArgumentException is thrown when vectors are of different size.
    */
   public boolean geq(Vector b) throws IllegalArgumentException {
-    // TODO
-    return false;
+    if (dimension != b.dimension) throw new IllegalArgumentException("Vectors are of different size");
+    for (int i = 0; i < dimension; i++) {
+      if (vector[i] < b.getTime(i)) return false;
+    }
+    return true;
   }
 
   /**
@@ -62,12 +73,20 @@ public class Vector {
    * @throws IllegalArgumentException If Vectors are of different size
    */
   public static Optional<Integer> compare(Vector a, Vector b) throws IllegalArgumentException {
-    // TODO
-    return null;
+    if (a.size() != b.size()) throw new IllegalArgumentException("Vectors are of different size");
+
+    // don't know why the testcases get Optional instead of actual value
+    if (a.equals(b)) return Optional.of(0);
+    if (a.geq(b)) return Optional.of(1);
+    if (b.geq(a)) return Optional.of(-1);
+
+    return Optional.empty();
   }
 
   public boolean equals(Vector b) {
-    // TODO
-    return false;
+    for (int i = 0; i < dimension; i++) {
+      if (vector[i] != b.getTime(i)) return false;
+    }
+    return true;
   }
 }
