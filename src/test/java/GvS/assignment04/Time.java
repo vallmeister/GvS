@@ -24,7 +24,7 @@ public class Time {
     // Clock that synchronizes at the start
     Clock initil = new SynchronizedClock(context, host, 5);
 
-    // Clock with initial time
+    //Clock with initial time
     Clock wrong = new SynchronizedClock(context, host, 5, initil.getTime()+2000);
 
     Util.log(

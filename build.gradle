@@ -12,6 +12,7 @@ plugins {
 
     // Apply the application plugin to add support for building a CLI application.
     id 'application'
+
 }
 
 repositories {
@@ -19,6 +20,7 @@ repositories {
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
 }
+
 
 dependencies {
     // This dependency is used by the application.
@@ -30,6 +32,11 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
 
     compile group: 'org.zeromq', name: 'jeromq', version: '0.5.2'
+    compile localGroovy()
+}
+
+test {
+    useJUnitPlatform()
 }
 
 application {

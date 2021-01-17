@@ -6,6 +6,7 @@ import org.zeromq.ZMQ;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ScheduledFuture;
 
 /**
  * @author David Mödinger
@@ -16,65 +17,60 @@ import java.util.List;
  * For every synchronization attempt, there should be 'requests' many requests to the server. All of them should be used.
  *
  */
-public class SynchronizedClock implements Runnable, Clock {
+public class SynchronizedClock implements Clock, Runnable {
   private long currentTime;
   private ZMQ.Context context;
-  private String host;
   private int numberOfRequests;
+
+  // using BaseClock for own time
+  private BaseClock baseClock;
 
   public SynchronizedClock(ZMQ.Context context, String host, int requests) {
     this.context = context;
-    this.host = host;
     this.numberOfRequests = requests;
-
-    ZMQ.Socket requestSocket = context.socket(SocketType.REQ);
-    requestSocket.connect("tcp://gvs.lxd-vs.uni-ulm.de:3322");
-    requestSocket.send("");
-    byte[] reply = requestSocket.recv();
-    currentTime = Long.parseLong(new String(reply, ZMQ.CHARSET));
-    Thread thread = new Thread(this);
-    thread.run();
+    getServerTime(true);
+    baseClock = new BaseClock(currentTime);
+    (new Thread(this)).start();
   }
 
   public SynchronizedClock(ZMQ.Context context, String host, int requests, long start) {
     // TODO
     this.numberOfRequests = requests;
     this.context = context;
-    this.host = host;
     currentTime = start;
+    baseClock = new BaseClock(currentTime);
+    (new Thread(this)).start();
   }
 
   public long getTime() {
+    getServerTime(false);
     return currentTime;
+  }
+
+   // Requests time from server and adjusts internal clock speed
+  private void getServerTime(boolean initial) {
+    ZMQ.Socket requestSocket = context.socket(SocketType.REQ);
+    requestSocket.connect("tcp://gvs.lxd-vs.uni-ulm.de:3322");
+    long startTime = System.currentTimeMillis();
+    requestSocket.send("");
+    byte[] reply = requestSocket.recv();
+    long endTime = System.currentTimeMillis();
+    long temp = Long.parseLong(new String(reply, ZMQ.CHARSET)) + endTime - startTime;
+
+    if (temp > currentTime && !initial) {
+      baseClock.speed_increase();
+      currentTime = temp;
+    } else if (temp < currentTime && !initial) {
+      // never set the currentTime back
+      baseClock.speed_decrease();
+    }
   }
 
   @Override
   public void run() {
-    List<Thread> threadList = new ArrayList<>(numberOfRequests);
-    for (int i = 0; i < numberOfRequests; i++) {
-      threadList.add(new Thread(new Runnable() {
-        @Override
-        public void run() {
-          ZMQ.Socket requestSocket = context.socket(SocketType.REQ);
-          requestSocket.connect("tcp://gvs.lxd-vs.uni-ulm.de:3322");
-          long timeBefore = System.currentTimeMillis();
-          requestSocket.send("");
-          byte[] reply = requestSocket.recv();
-          long timeAfter = System.currentTimeMillis();
-          long roundTripTime = timeAfter - timeBefore;
-          currentTime = Long.parseLong(new String(reply, ZMQ.CHARSET)) + roundTripTime / 2;
-        }
-      }));
-
-      while (!Thread.currentThread().isInterrupted()) {
-        try {
-          Thread.sleep(1_000);
-        } catch (InterruptedException interruptedException) {
-          interruptedException.printStackTrace();
-        }
-        for (Thread thread : threadList) {
-          thread.run();
-        }
+    while (true) {
+      if (currentTime < baseClock.getTime()) {
+        currentTime = baseClock.getTime();
       }
     }
   }

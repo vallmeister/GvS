@@ -1,27 +1,27 @@
 package assignment04;
 
 public class Lamport implements Comparable<Lamport>{
-  // TODO
+  private long counter;
 
   public Lamport() {
-    // TODO
+    counter = 0;
   }
 
   public Lamport(long init) {
-    // TODO
+    counter = init;
   }
 
   public long getTime() {
     // TODO
-    return 0;
+    return counter;
   }
 
   /**
    * Also returns incremented time.
    */
   public long increment() {
-    // TODO
-    return 0;
+    counter++;
+    return counter;
   }
 
   public long merge(Lamport b) {
@@ -40,13 +40,13 @@ public class Lamport implements Comparable<Lamport>{
   }
 
   public boolean equals(Lamport b) {
-    // TODO
-    return false;
+    return b.getTime() == getTime();
   }
 
   @Override
   public int compareTo(Lamport l) {
-    // TODO
+    if (l.getTime() > getTime()) return -1;
+    else if (l.getTime() < getTime()) return 1;
     return 0;
   }
 }
